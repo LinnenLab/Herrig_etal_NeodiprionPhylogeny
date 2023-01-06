@@ -1,0 +1,71 @@
+#!/bin/bash
+#SBATCH -t 7-00:00:00
+#SBATCH --job-name=speciesname
+#SBATCH -n 2
+#SBATCH -p SKY32M192_L
+#SBATCH --account=col_cli242_uksr
+#SBATCH --mail-type ALL 
+#SBATCH --mail-user dkhe223@uky.edu
+#SBATCH --output=speciesname.out
+
+module load ccs/anaconda/3
+source activate /project/cli242_uksr/dkhe223/conda/itrep
+#https://samtools.github.io/bcftools/howtos/consensus-sequence.html
+
+cd /scratch/dkhe223/pacbiorepit/makegenomes
+rm -r speciesname
+mkdir speciesname
+cd speciesname
+
+echo "initial round to Nlec -N 1 and local --> 1 mismatches allowed in seed"
+bowtie2 -x ../Nlecref -1 $SCRATCH/files/processedreads/speciesname_laneinfo_processed_R1.fastq.gz -2 $SCRATCH/files/processedreads/speciesname_laneinfo_processed_R2.fastq.gz -N 1 --local -S speciesname.sam
+samtools view -bS speciesname.sam > speciesname.bam
+samtools sort speciesname.bam -o speciesname.sorted.bam
+#call variants, -mv means --multiallelic-caller --variants-only and -Oz means output is compressed VCF, -V indels means skip indels
+bcftools mpileup -Ou -f ../Nlec_HiC_scaffolds_primary.fasta speciesname.sorted.bam | bcftools call -mv -Oz -o it1.calls.vcf.gz -V indels
+bcftools index it1.calls.vcf.gz
+cat ../Nlec_HiC_scaffolds_primary.fasta | bcftools consensus it1.calls.vcf.gz > it1_speciesname.fa
+
+echo "bowtie2 to it1 and -N 1 mismatch allowed in seed"
+bowtie2-build it1_speciesname.fa it1_speciesname
+bowtie2 -x it1_speciesname -1 $SCRATCH/files/processedreads/speciesname_laneinfo_processed_R1.fastq.gz -2 $SCRATCH/files/processedreads/speciesname_laneinfo_processed_R2.fastq.gz --local -N 1 -S speciesname_it2.sam
+samtools view -bS speciesname_it2.sam > speciesname_it2.bam
+samtools sort speciesname_it2.bam -o speciesname_it2.sorted.bam
+#call variants -mv means --multiallelic-caller --variants-only and -Oz means output is compressed VCF -V indels means skip indels
+bcftools mpileup -Ou -f it1_speciesname.fa speciesname_it2.sorted.bam | bcftools call -mv -Oz -o it2.calls.vcf.gz -V indels
+bcftools index it2.calls.vcf.gz
+cat it1_speciesname.fa | bcftools consensus it2.calls.vcf.gz > it2_speciesname.fa
+
+echo "bowtie2 to it2 and local"
+bowtie2-build it2_speciesname.fa it2_speciesname
+bowtie2 -x it2_speciesname -1 $SCRATCH/files/processedreads/speciesname_laneinfo_processed_R1.fastq.gz -2 $SCRATCH/files/processedreads/speciesname_laneinfo_processed_R2.fastq.gz --local -S speciesname_it3.sam
+samtools view -bS speciesname_it3.sam > speciesname_it3.bam
+samtools sort speciesname_it3.bam -o speciesname_it3.sorted.bam
+bcftools mpileup -Ou -f it2_speciesname.fa speciesname_it3.sorted.bam | bcftools call -mv -Oz -o it3.calls.vcf.gz -V indels
+bcftools index it3.calls.vcf.gz
+cat it2_speciesname.fa| bcftools consensus it3.calls.vcf.gz > it3_speciesname.fa
+
+echo "bowtie2 to it3 using end-to-end"
+bowtie2-build it3_speciesname.fa it3_speciesname
+bowtie2 -x it3_speciesname -1 $SCRATCH/files/processedreads/speciesname_laneinfo_processed_R1.fastq.gz -2 $SCRATCH/files/processedreads/speciesname_laneinfo_processed_R2.fastq.gz -S speciesname_it4.sam
+samtools view -bS speciesname_it4.sam > speciesname_it4.bam
+samtools sort speciesname_it4.bam -o speciesname_it4.sorted.bam
+bcftools mpileup -Ou -f it3_speciesname.fa speciesname_it4.sorted.bam | bcftools call -mv -Oz -o it4.calls.vcf.gz -V indels
+bcftools index it4.calls.vcf.gz
+cat it3_speciesname.fa| bcftools consensus it4.calls.vcf.gz > it4_speciesname.fa
+
+echo "bowtie2 to it4 end-to-end"
+bowtie2-build it4_speciesname.fa it4_speciesname
+bowtie2 -x it4_speciesname -1 $SCRATCH/files/processedreads/speciesname_laneinfo_processed_R1.fastq.gz -2 $SCRATCH/files/processedreads/speciesname_laneinfo_processed_R2.fastq.gz -S speciesname_it5.sam
+samtools view -bS speciesname_it5.sam > speciesname_it5.bam
+samtools sort speciesname_it5.bam -o speciesname_it5.sorted.bam
+call variants
+#-mv means --multiallelic-caller --variants-only and -Oz means output is compressed VCF -V indels means skip indels
+bcftools mpileup -Ou -f it4_speciesname.fa speciesname_it5.sorted.bam | bcftools call -mv -Oz -o it5.calls.vcf.gz -V indels
+bcftools index it5.calls.vcf.gz
+cat it4_speciesname.fa | bcftools consensus it5.calls.vcf.gz > it5_speciesname.fa
+cat it4_speciesname.fa | bcftools consensus -I it5.calls.vcf.gz > iupac_it5_speciesname.fa
+#-mv means --multiallelic-caller --variants-only and -Oz means output is compressed VCF
+bcftools mpileup -Ou -f it4_speciesname.fa speciesname_it5.sorted.bam | bcftools call -mv -Oz -o it5_withindels.calls.vcf.gz
+bcftools index it5_withindels.calls.vcf.gz
+cat it4_speciesname.fa | bcftools consensus it5_withindels.calls.vcf.gz > it5_withindels_speciesname.fa

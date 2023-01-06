@@ -1,0 +1,70 @@
+#!/bin/bash
+#SBATCH -t 7-00:00:00
+#SBATCH --job-name=gfftofasta
+#SBATCH -n 1
+#SBATCH -p HAS24M128_M
+#SBATCH --account=col_cli242_uksr
+#SBATCH --mail-type ALL
+#SBATCH --mail-user dkhe223@uky.edu
+#SBATCH --output=GFFtoFastas.out
+
+module load ccs/anaconda/3
+source activate /project/cli242_uksr/dkhe223/conda
+conda activate /project/cli242_uksr/dkhe223/conda/phylogenies
+#conda install -c bioconda gffread 
+
+printf "Obtaining fastas per species\n"
+mkdir speciesmRNA
+gffread -w speciesmRNA/mRNA_Nlec_pacbio.fa -g ../wholefasta/Neodiprion_lecontei_male_scaffolds.fasta Neodiprion_lecontei_male_scaffolds.gff -F
+gffread -w speciesmRNA/mRNA_abbotii.fa -g ../wholefasta/abbotii_rd4totop1percentorN.fa Neodiprion_lecontei_male_scaffolds.gff -F
+gffread -w speciesmRNA/mRNA_abietis.fa -g ../wholefasta/abietis_rd4totop1percentorN.fa Neodiprion_lecontei_male_scaffolds.gff -F
+gffread -w speciesmRNA/mRNA_autumnalis.fa -g ../wholefasta/autumnalis_rd4totop1percentorN.fa Neodiprion_lecontei_male_scaffolds.gff -F
+gffread -w speciesmRNA/mRNA_compar.fa -g ../wholefasta/compar_rd4totop1percentorN.fa Neodiprion_lecontei_male_scaffolds.gff -F
+gffread -w speciesmRNA/mRNA_dubiosus.fa -g ../wholefasta/dubiosus_rd4totop1percentorN.fa Neodiprion_lecontei_male_scaffolds.gff -F
+gffread -w speciesmRNA/mRNA_excitans.fa -g ../wholefasta/excitans_rd4totop1percentorN.fa Neodiprion_lecontei_male_scaffolds.gff -F
+gffread -w speciesmRNA/mRNA_fabricii.fa -g ../wholefasta/fabricii_rd4totop1percentorN.fa Neodiprion_lecontei_male_scaffolds.gff -F
+gffread -w speciesmRNA/mRNA_hetricki.fa -g ../wholefasta/hetricki_rd4totop1percentorN.fa Neodiprion_lecontei_male_scaffolds.gff -F
+gffread -w speciesmRNA/mRNA_knereri.fa -g ../wholefasta/knereri_rd4totop1percentorN.fa Neodiprion_lecontei_male_scaffolds.gff -F
+gffread -w speciesmRNA/mRNA_leconteiN.fa -g ../wholefasta/leconteiN_rd4totop1percentorN.fa Neodiprion_lecontei_male_scaffolds.gff -F
+gffread -w speciesmRNA/mRNA_leconteiS.fa -g ../wholefasta/leconteiS_rd4totop1percentorN.fa Neodiprion_lecontei_male_scaffolds.gff -F
+gffread -w speciesmRNA/mRNA_maurus.fa -g ../wholefasta/maurus_rd4totop1percentorN.fa Neodiprion_lecontei_male_scaffolds.gff -F
+gffread -w speciesmRNA/mRNA_merkeli.fa -g ../wholefasta/merkeli_rd4totop1percentorN.fa Neodiprion_lecontei_male_scaffolds.gff -F
+gffread -w speciesmRNA/mRNA_nigroscutum.fa -g ../wholefasta/nigroscutum_rd4totop1percentorN.fa Neodiprion_lecontei_male_scaffolds.gff -F
+gffread -w speciesmRNA/mRNA_pinetum.fa -g ../wholefasta/pinetum_rd4totop1percentorN.fa Neodiprion_lecontei_male_scaffolds.gff -F
+gffread -w speciesmRNA/mRNA_pinusrigidae.fa -g ../wholefasta/pinusrigidae_rd4totop1percentorN.fa Neodiprion_lecontei_male_scaffolds.gff -F
+gffread -w speciesmRNA/mRNA_pratti.fa -g ../wholefasta/pratti_rd4totop1percentorN.fa Neodiprion_lecontei_male_scaffolds.gff -F
+gffread -w speciesmRNA/mRNA_rugifrons.fa -g ../wholefasta/rugifrons_rd4totop1percentorN.fa Neodiprion_lecontei_male_scaffolds.gff -F
+gffread -w speciesmRNA/mRNA_sertifer.fa -g ../wholefasta/sertifer_rd4totop1percentorN.fa Neodiprion_lecontei_male_scaffolds.gff -F
+gffread -w speciesmRNA/mRNA_swainei.fa -g ../wholefasta/swainei_rd4totop1percentorN.fa Neodiprion_lecontei_male_scaffolds.gff -F
+gffread -w speciesmRNA/mRNA_taedae.fa -g ../wholefasta/taedae_rd4totop1percentorN.fa Neodiprion_lecontei_male_scaffolds.gff -F
+gffread -w speciesmRNA/mRNA_virginianus.fa -g ../wholefasta/virginianus_rd4totop1percentorN.fa Neodiprion_lecontei_male_scaffolds.gff -F
+gffread -w speciesmRNA/mRNA_warreni.fa -g ../wholefasta/warreni_rd4totop1percentorN.fa Neodiprion_lecontei_male_scaffolds.gff -F
+
+printf '\n#make fastas, treejobs, and trees for 20species'
+mkdir 20species_mRNA
+python Make_individualgene_fastas_20species.py
+
+mkdir 20species_iqtreejobs/
+python make_iqtreejobs_20species.py
+
+cd 20species_iqtreejobs
+chmod +x submitiqtrees
+./submitiqtrees
+
+cd ..
+
+printf '\n#make fastas, treejobs, and trees for internal clade'
+mkdir internal_mRNA
+python Make_individualgene_fastas_internal.py
+
+mkdir internal_iqtreejobs/
+python make_iqtreejobs_internal.py
+
+cd internal_iqtreejobs
+chmod +x submitiqtrees
+./submitiqtrees
+
+
+
+
+

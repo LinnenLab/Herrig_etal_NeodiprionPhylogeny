@@ -1,0 +1,22 @@
+#!/bin/bash
+#SBATCH -t 7-00:00:00
+#SBATCH --job-name=SNPs
+
+#SBATCH -n 1
+#SBATCH -p SKY32M192_L
+#SBATCH --account=col_cli242_uksr
+#SBATCH --mail-type ALL
+#SBATCH --mail-user dkhe223@uky.edu
+#SBATCH --output=getSNPs.out
+
+module load ccs/anaconda/3
+source activate /project/cli242_uksr/dkhe223/conda/phylogenies
+conda list
+
+bcftools view -e 'AC==0 || AC==AN || F_MISSING > 0.1' -m2 -M2 -o vcf/filtered-chr1.vcf vcf/chr1.vcf
+bcftools view -e 'AC==0 || AC==AN || F_MISSING > 0.1' -m2 -M2 -o vcf/filtered-chr2.vcf vcf/chr2.vcf
+bcftools view -e 'AC==0 || AC==AN || F_MISSING > 0.1' -m2 -M2 -o vcf/filtered-chr3.vcf vcf/chr3.vcf
+bcftools view -e 'AC==0 || AC==AN || F_MISSING > 0.1' -m2 -M2 -o vcf/filtered-chr4.vcf vcf/chr4.vcf
+bcftools view -e 'AC==0 || AC==AN || F_MISSING > 0.1' -m2 -M2 -o vcf/filtered-chr5.vcf vcf/chr5.vcf
+bcftools view -e 'AC==0 || AC==AN || F_MISSING > 0.1' -m2 -M2 -o vcf/filtered-chr6.vcf vcf/chr6.vcf
+bcftools view -e 'AC==0 || AC==AN || F_MISSING > 0.1' -m2 -M2 -o vcf/filtered-chr7.vcf vcf/chr7.vcf

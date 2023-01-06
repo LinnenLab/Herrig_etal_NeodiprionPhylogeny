@@ -1,0 +1,23 @@
+#!/bin/bash
+#SBATCH -t 7-00:00:00
+#SBATCH --job-name=SNPs
+
+#SBATCH -n 1
+#SBATCH -p SKY32M192_L
+#SBATCH --account=col_cli242_uksr
+#SBATCH --mail-type ALL
+#SBATCH --mail-user dkhe223@uky.edu
+#SBATCH --output=getSNPs.out
+
+module load ccs/anaconda/3
+source activate /project/cli242_uksr/dkhe223/conda/phylogenies
+
+mkdir IUPAC-vcf
+
+snp-sites -v -o noIUPAC-vcf/chr1.vcf ../chromosomes/chr1.fa
+snp-sites -v -o noIUPAC-vcf/chr2.vcf ../chromosomes/chr2.fa
+snp-sites -v -o noIUPAC-vcf/chr3.vcf ../chromosomes/chr3.fa
+snp-sites -v -o noIUPAC-vcf/chr4.vcf ../chromosomes/chr4.fa
+snp-sites -v -o noIUPAC-vcf/chr5.vcf ../chromosomes/chr5.fa
+snp-sites -v -o noIUPAC-vcf/chr6.vcf ../chromosomes/chr6.fa
+snp-sites -v -o noIUPAC-vcf/chr7.vcf ../chromosomes/chr7.fa

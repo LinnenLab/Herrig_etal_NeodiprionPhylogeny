@@ -1,0 +1,30 @@
+#!/bin/bash 
+#SBATCH --time 7-00:00:00 
+#SBATCH --job-name=speciesname_depth
+#SBATCH --nodes=1 
+#SBATCH --ntasks=16 
+#SBATCH --partition=SAN16M64_M 
+#SBATCH --account=col_cli242_uksr 
+#SBATCH --output=speciesname_minmaxNs.out
+
+module load ccs/anaconda/3 
+source activate /project/cli242_uksr/dkhe223/conda 
+source activate itrep 
+
+cd ../speciesname
+
+bowtie2-build iupac_it5_speciesname.fa iupac_it5_speciesname
+bowtie2 -x iupac_it5_speciesname -1 $SCRATCH/files/processedreads/speciesname_laneinfo_processed_R1.fastq.gz -2 $SCRATCH/files/processedreads/speciesname_laneinfo_processed_R2.fastq.gz -S speciesname_final.sam
+
+echo "starting samtools depth" 
+samtools view -bS speciesname_final.sam > speciesname_final.bam
+samtools sort speciesname_final.bam -o speciesname_final.sorted.bam
+samtools depth -H -a speciesname_final.sorted.bam -o speciesname_final.depth.matrix  
+ 
+echo "head of speciesname_fordepth.depth.matrix" 
+head speciesname_final.depth.matrix 
+ 
+echo "make new fasta" 
+cp ../base_samtoolsdepth_final.py speciesname_samtoolsdepth_final.py 
+sed -i -- 's/currentspecies/speciesname/g' speciesname_samtoolsdepth_final.py  
+python speciesname_samtoolsdepth_final.py

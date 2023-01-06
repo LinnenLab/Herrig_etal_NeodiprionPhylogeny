@@ -1,0 +1,18 @@
+#!/bin/bash
+#SBATCH -t 7-00:00:00
+#SBATCH --job-name=SNPs
+
+#SBATCH -n 1
+#SBATCH -p HAS24M128_M
+#SBATCH --account=col_cli242_uksr
+#SBATCH --mail-type ALL
+#SBATCH --mail-user youremail
+#SBATCH --output=getSNPs.out
+
+module load ccs/anaconda/3
+source activate /project/cli242_uksr/dkhe223/conda/phylogenies
+conda list
+pwd
+
+python chromosomefastas.py
+python Make_individual_chromosome_fastas-20species.py 

@@ -1,0 +1,67 @@
+#!/bin/bash
+#SBATCH -t 7-00:00:00
+#SBATCH --job-name=sizeinkb000_sampleSNPs
+
+#SBATCH -n 1
+#SBATCH -p SKY32M192_L
+#SBATCH --account=col_cli242_uksr
+#SBATCH --mail-type ALL
+#SBATCH --mail-user dkhe223@gmail.com
+#SBATCH --output=sampleSNPs.out
+
+module load ccs/anaconda/3
+source activate /project/cli242_uksr/dkhe223/conda/phylogenies
+conda list
+pwd
+
+cp ../vcf2fasta.py .
+#note: vcf files made from command: snp-sites -v -c -o chr1.vcf ../chromosomes/chr1.fa
+
+printf 'pull thinned variants and make fastas'
+#sed '/*/d' ../vcf/filtered-chr1.vcf > ../vcf/filtered-chr1.vcf
+vcftools --vcf ../vcf/filtered-chr1.vcf --out sizeinkb_chr1vcf --thin sizeinkb000 --get-INFO NS --get-INFO DB
+vcftools --vcf ../vcf/filtered-chr1.vcf --out sizeinkb_chr1vcf --thin sizeinkb000 --extract-FORMAT-info GT
+python vcf2fasta.py sizeinkb_chr1
+
+#sed '/*/d' ../vcf/filtered-chr2.vcf > ../vcf/filtered-chr2.vcf
+vcftools --vcf ../vcf/filtered-chr2.vcf --out sizeinkb_chr2vcf --thin sizeinkb000 --get-INFO NS --get-INFO DB
+vcftools --vcf ../vcf/filtered-chr2.vcf --out sizeinkb_chr2vcf --thin sizeinkb000 --extract-FORMAT-info GT
+python vcf2fasta.py sizeinkb_chr2
+
+#sed '/*/d' ../vcf/filtered-chr3.vcf > ../vcf/filtered-chr3.vcf
+vcftools --vcf ../vcf/filtered-chr3.vcf --out sizeinkb_chr3vcf --thin sizeinkb000 --get-INFO NS --get-INFO DB
+vcftools --vcf ../vcf/filtered-chr3.vcf --out sizeinkb_chr3vcf --thin sizeinkb000 --extract-FORMAT-info GT
+python vcf2fasta.py sizeinkb_chr3
+
+#sed '/*/d' ../vcf/filtered-chr4.vcf > ../vcf/filtered-chr4.vcf
+vcftools --vcf ../vcf/filtered-chr4.vcf --out sizeinkb_chr4vcf --thin sizeinkb000 --get-INFO NS --get-INFO DB
+vcftools --vcf ../vcf/filtered-chr4.vcf --out sizeinkb_chr4vcf --thin sizeinkb000 --extract-FORMAT-info GT
+python vcf2fasta.py sizeinkb_chr4
+
+#sed '/*/d' ../vcf/filtered-chr5.vcf > ../vcf/filtered-chr5.vcf
+vcftools --vcf ../vcf/filtered-chr5.vcf --out sizeinkb_chr5vcf --thin sizeinkb000 --get-INFO NS --get-INFO DB
+vcftools --vcf ../vcf/filtered-chr5.vcf --out sizeinkb_chr5vcf --thin sizeinkb000 --extract-FORMAT-info GT
+python vcf2fasta.py sizeinkb_chr5
+
+#sed '/*/d' ../vcf/filtered-chr6.vcf > ../vcf/filtered-chr6.vcf
+vcftools --vcf ../vcf/filtered-chr6.vcf --out sizeinkb_chr6vcf --thin sizeinkb000 --get-INFO NS --get-INFO DB
+vcftools --vcf ../vcf/filtered-chr6.vcf --out sizeinkb_chr6vcf --thin sizeinkb000 --extract-FORMAT-info GT
+python vcf2fasta.py sizeinkb_chr6
+
+#sed '/*/d' ../vcf/filtered-chr7.vcf > ../vcf/filtered-chr7.vcf
+vcftools --vcf ../vcf/filtered-chr7.vcf --out sizeinkb_chr7vcf --thin sizeinkb000 --get-INFO NS --get-INFO DB
+vcftools --vcf ../vcf/filtered-chr7.vcf --out sizeinkb_chr7vcf --thin sizeinkb000 --extract-FORMAT-info GT
+python vcf2fasta.py sizeinkb_chr7
+
+printf 'start #iqtrees'
+#iqtree -s sizeinkb_chr1.fasta -o autumnalis -m MFP+ASC -bb sizeinkb000 -alrt sizeinkb000
+#iqtree -s sizeinkb_chr2.fasta -o autumnalis -m MFP+ASC -bb sizeinkb000 -alrt sizeinkb000
+#iqtree -s sizeinkb_chr3.fasta -o autumnalis -m MFP+ASC -bb sizeinkb000 -alrt sizeinkb000
+#iqtree -s sizeinkb_chr4.fasta -o autumnalis -m MFP+ASC -bb sizeinkb000 -alrt sizeinkb000
+#iqtree -s sizeinkb_chr5.fasta -o autumnalis -m MFP+ASC -bb sizeinkb000 -alrt sizeinkb000
+#iqtree -s sizeinkb_chr6.fasta -o autumnalis -m MFP+ASC -bb sizeinkb000 -alrt sizeinkb000
+#iqtree -s sizeinkb_chr7.fasta -o autumnalis -m MFP+ASC -bb sizeinkb000 -alrt sizeinkb000
+
+printf 'combine chromosome calls into single file'
+grep '>' sizeinkb_chr1.fasta > species.txt
+python ../combine_subsampled_chrSNPs.py sizeinkb000

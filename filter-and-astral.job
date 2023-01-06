@@ -1,0 +1,20 @@
+#!/bin/bash
+#SBATCH -t 7-00:00:00
+#SBATCH --job-name=1mbfilter
+
+#SBATCH -n 1
+#SBATCH -p SKY32M192_L
+#SBATCH --account=col_cli242_uksr
+#SBATCH --mail-type ALL
+#SBATCH --mail-user dkhe223@uky.edu
+#SBATCH --output=filter.out
+
+echo "calculate missing"
+python calculate_hetsandmissing-20species.py 1000
+
+echo "pull trees"
+python filter-10percentmissing.py 1000
+
+java8 java -jar /scratch/dkhe223/software/ASTRAL-master/Astral/astral.5.7.3.jar -i filteredmissing-20sp.trees  -o astral-filteredmissing-20sp-onelec.trees > 20species_filteredmissing-20sp-onelec_filter.log
+
+java8 java -jar /scratch/dkhe223/software/ASTRAL-master/Astral/astral.5.7.3.jar -i filteredmissing-20sp.trees -t 1 -o t1-astral-filteredmissing-onelec.trees > t1-20species_filter.log

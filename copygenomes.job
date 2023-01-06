@@ -1,0 +1,33 @@
+#!/bin/bash
+#SBATCH -t 7-00:00:00
+#SBATCH --job-name=copy
+#SBATCH -n 1
+#SBATCH -p SKY32M192_L
+#SBATCH --account=col_cli242_uksr
+#SBATCH --mail-type ALL 
+#SBATCH --mail-user dkhe223@uky.edu
+#SBATCH --output=copy.out
+
+cp makegenomes/abbotii/abbotii_iupac_it5.depth_withnucleotide_rd4totop1percentorN.fa wholefasta/
+cp makegenomes/abietis/abietis_iupac_it5.depth_withnucleotide_rd4totop1percentorN.fa wholefasta/
+cp makegenomes/autumnalis/autumnalis_iupac_it5.depth_withnucleotide_rd4totop1percentorN.fa wholefasta/
+cp makegenomes/compar/compar_iupac_it5.depth_withnucleotide_rd4totop1percentorN.fa wholefasta/
+cp makegenomes/dubiosus/dubiosus_iupac_it5.depth_withnucleotide_rd4totop1percentorN.fa wholefasta/
+cp makegenomes/excitans/excitans_iupac_it5.depth_withnucleotide_rd4totop1percentorN.fa wholefasta/
+cp makegenomes/fabricii/fabricii_iupac_it5.depth_withnucleotide_rd4totop1percentorN.fa wholefasta/
+cp makegenomes/hetricki/hetricki_iupac_it5.depth_withnucleotide_rd4totop1percentorN.fa wholefasta/
+cp makegenomes/knereri/knereri_iupac_it5.depth_withnucleotide_rd4totop1percentorN.fa wholefasta/
+cp makegenomes/leconteiN/leconteiN_iupac_it5.depth_withnucleotide_rd4totop1percentorN.fa wholefasta/
+cp makegenomes/leconteiS/leconteiS_iupac_it5.depth_withnucleotide_rd4totop1percentorN.fa wholefasta/
+cp makegenomes/maurus/maurus_iupac_it5.depth_withnucleotide_rd4totop1percentorN.fa wholefasta/
+cp makegenomes/merkeli/merkeli_iupac_it5.depth_withnucleotide_rd4totop1percentorN.fa wholefasta/
+cp makegenomes/nigroscutum/nigroscutum_iupac_it5.depth_withnucleotide_rd4totop1percentorN.fa wholefasta/
+cp makegenomes/pinetum/pinetum_iupac_it5.depth_withnucleotide_rd4totop1percentorN.fa wholefasta/
+cp makegenomes/pinusrigidae/pinusrigidae_iupac_it5.depth_withnucleotide_rd4totop1percentorN.fa wholefasta/
+cp makegenomes/pratti/pratti_iupac_it5.depth_withnucleotide_rd4totop1percentorN.fa wholefasta/
+cp makegenomes/rugifrons/rugifrons_iupac_it5.depth_withnucleotide_rd4totop1percentorN.fa wholefasta/
+cp makegenomes/sertifer/sertifer_iupac_it5.depth_withnucleotide_rd4totop1percentorN.fa wholefasta/
+cp makegenomes/swainei/swainei_iupac_it5.depth_withnucleotide_rd4totop1percentorN.fa wholefasta/
+cp makegenomes/taedae/taedae_iupac_it5.depth_withnucleotide_rd4totop1percentorN.fa wholefasta/
+cp makegenomes/virginianus/virginianus_iupac_it5.depth_withnucleotide_rd4totop1percentorN.fa wholefasta/
+cp makegenomes/warreni/warreni_iupac_it5.depth_withnucleotide_rd4totop1percentorN.fa wholefasta/
